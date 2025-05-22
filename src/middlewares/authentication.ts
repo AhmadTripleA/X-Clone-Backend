@@ -1,15 +1,19 @@
-import { NextFunction, Request, Response } from "express";
-import { ValidRequest } from "../types/common";
+import { NextFunction, Request, Response } from 'express';
+import { ValidRequest } from '../types/common';
+import { Unauthorized } from '../helpers/errors';
+import { verifyAccessToken } from '../utils/jwt';
 
 export class AuthenticationMW {
-
     public validToken = async (req: Request, res: Response, next: NextFunction) => {
-        const validReq = req as ValidRequest;
-        if ((validReq.headers.access_token ?? "") == "dev") {
-            validReq.user_id = 2000;
-            next();
-        }
+        try {
+            const token = req.headers.authorization?.split(' ')?.[1] ?? '';
+            const payload = verifyAccessToken(token);
+            const request = req as ValidRequest;
+            request.user_id = typeof payload == 'string' ? 0 : Number(payload.sub);
 
-        else throw new Error("Bad Authentication.");
-    }
+            if (!request.user_id) throw new Error();
+        } catch (_) {
+            next(new Unauthorized('Invalid Token'));
+        }
+    };
 }
