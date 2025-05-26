@@ -25,12 +25,16 @@ const createPost = async (req: ValidRequest<CreatePostReqBody>, res: Response) =
     validateData(req.body, createPostBodyVal);
 
     const data = processor.processPostCreation(req);
+    
     const post = service.createNewPost(data);
+    
     res.status(200).send({ Post: post });
 };
 
 const getPostById = async (req: ValidRequest, res: Response) => {
     const post_id = Number(req.params.id);
+    
     const post = await service.getById(post_id);
+    
     res.status(200).send({ Post: post });
 };

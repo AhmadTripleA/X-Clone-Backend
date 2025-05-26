@@ -5,12 +5,9 @@ import { UserServices } from '../../services/user-services';
 import { comparePassword, hashPassword } from '../../utils/hashing';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../../utils/jwt';
 import { AuthLoginReq, AuthRegisterReq } from './interfaces';
-import { zEmail } from './validators';
 
 export class AuthService {
     public static async RegisterNewUser(data: AuthRegisterReq) {
-        zEmail.parse(data.email);
-
         const [hashedPass, existingUser] = await Promise.all([
             hashPassword(data.password),
             UserServices.getByUsername(data.username),

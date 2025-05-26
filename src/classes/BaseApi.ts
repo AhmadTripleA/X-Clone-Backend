@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response, Router } from 'express';
 import { ValidRequest } from '../types/common';
 
-export interface CustomReq<Body = any> {
-    method: 'get' | 'post' | 'update' | 'delete';
+export interface CustomReq {
+    method: 'get' | 'post' | 'put' | 'delete';
     route: string;
     middlewares?: any[];
-    handler: (req: ValidRequest<Body>, res: Response) => Promise<void>;
+    handler: (req: ValidRequest, res: Response) => Promise<void>;
 }
 
 export abstract class BaseAPI {

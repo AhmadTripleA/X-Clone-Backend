@@ -4,9 +4,13 @@ import { Unauthorized } from '../helpers/errors';
 import { verifyAccessToken } from '../utils/jwt';
 
 export class AuthenticationMW {
-    public validToken = async (req: Request, res: Response, next: NextFunction) => {
+    public static validToken = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const token = req.headers.authorization?.split(' ')?.[1] ?? '';
+            if(!token){
+                return next(new Unauthorized('Missing Token'));
+            }
+
             const payload = verifyAccessToken(token);
             const request = req as ValidRequest;
             request.user_id = typeof payload == 'string' ? 0 : Number(payload.sub);

@@ -5,8 +5,7 @@ import { UsersAPI } from '../modules/users/controller';
 import { PostsAPI } from '../modules/posts/controller';
 import { AuthAPI } from '../modules/auth/controller';
 
-const authMW = new AuthenticationMW();
-const validToken = authMW.validToken;
+const validToken = AuthenticationMW.validToken;
 
 export const routes: {
     path: string;

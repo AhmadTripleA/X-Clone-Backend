@@ -1,18 +1,5 @@
 import z from "zod";
 
-export const AuthRegisterReqValidator = z.object({
-    username: z.string(),
-    password: z.string(),
-    first_name: z.string(),
-    last_name: z.string(),
-});
-
-export const AuthLoginReqValidator = z.object({
-    username: z.string(),
-    password: z.string(),
-}).strict('No Extra Data Allowed');
-
-
 export const zEmail = z.string().superRefine((val, ctx) => {
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
     
@@ -27,3 +14,16 @@ export const zEmail = z.string().superRefine((val, ctx) => {
     
     console.log(`*** Email Validation Success ***`);
 })
+
+export const AuthRegisterReqValidator = z.object({
+    username: z.string(),
+    password: z.string(),
+    first_name: z.string(),
+    last_name: z.string(),
+    email: zEmail,
+});
+
+export const AuthLoginReqValidator = z.object({
+    username: z.string(),
+    password: z.string(),
+}).strict('No Extra Data Allowed');
