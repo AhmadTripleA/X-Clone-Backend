@@ -12,6 +12,8 @@ export class AuthenticationMW {
             request.user_id = typeof payload == 'string' ? 0 : Number(payload.sub);
 
             if (!request.user_id) throw new Error();
+
+            next();
         } catch (_) {
             next(new Unauthorized('Invalid Token'));
         }

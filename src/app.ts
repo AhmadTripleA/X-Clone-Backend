@@ -5,13 +5,20 @@ import cors from 'cors';
 import { Router } from './routers';
 import { GlobalErrorHandler } from './utils/globalErrorHandler';
 import db from './connections/db';
+import cookieParser from 'cookie-parser';
 
 const { PORT } = process.env;
 
 const app = express();
 
-app.use(cors());
+app.use(
+    cors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+    }),
+);
 app.use(express.json());
+app.use(cookieParser())
 
 new Router(app);
 

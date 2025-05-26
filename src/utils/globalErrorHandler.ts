@@ -35,7 +35,7 @@ export const GlobalErrorHandler = (err: unknown, req: Request, res: Response, ne
 
     logger.error(message, globalLog);
 
-    res.status(status).send({ Error: process.env.NODE_ENV == 'production' ? error_type : globalLog });
+    res.status(status).send(globalLog);
 };
 
 function generateCurl(req: Request): string {

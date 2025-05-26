@@ -1,7 +1,9 @@
 import { NewUser } from '../../connections/db-schema';
+import { BadRequest, Unauthorized } from '../../helpers/errors';
+import { ValidRequest } from '../../types/common';
 import { UserServices } from '../../services/user-services';
 import { comparePassword, hashPassword } from '../../utils/hashing';
-import { signAccessToken, signRefreshToken } from '../../utils/jwt';
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../../utils/jwt';
 import { AuthLoginReq, AuthRegisterReq } from './interfaces';
 import { zEmail } from './validators';
 
@@ -51,5 +53,22 @@ export class AuthService {
         const refreshToken = signRefreshToken(user.id);
 
         return { refreshToken, accessToken };
+    }
+
+    public static async Refresh(request: ValidRequest) {
+        const refreshToken = request.cookies?.['refreshToken'];
+        if (!refreshToken) throw new BadRequest('No refresh token');
+
+        const payload = verifyRefreshToken(refreshToken.toString());
+
+        const sub = typeof payload == 'string' ? payload : payload.sub;
+        if (!sub) {
+            throw new Unauthorized('Invalid user id in token');
+        }
+
+        const accessToken = signAccessToken(sub);
+        const newRefreshToken = signRefreshToken(sub);
+
+        return { refreshToken: newRefreshToken, accessToken };
     }
 }

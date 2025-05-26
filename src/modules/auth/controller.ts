@@ -11,6 +11,7 @@ export class AuthAPI extends BaseAPI {
     protected requests: CustomReq[] = [
         { route: '/register', method: 'post', handler: register },
         { route: '/login', method: 'post', handler: login },
+        { route: '/refresh', method: 'get', handler: refresh },
     ];
 
     constructor() {
@@ -26,17 +27,18 @@ const register = async (req: ValidRequest<AuthRegisterReq>, res: Response) => {
 
     if (data) {
         res.status(200)
-            .send({ success: true, user: data.user, access_token: data.accessToken })
             .cookie('refreshToken', data.refreshToken, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'strict',
                 maxAge: 7 * 24 * 60 * 60 * 1000,
-            });
+            })
+            .send({ success: true, user: data.user, access_token: data.accessToken });
     } else {
         res.status(409).send({ success: false, message: 'Could not create user.' });
     }
 };
+
 
 const login = async (req: ValidRequest<AuthLoginReq>, res: Response) => {
     validateData(req.body, AuthLoginReqValidator);
@@ -46,11 +48,25 @@ const login = async (req: ValidRequest<AuthLoginReq>, res: Response) => {
     if (!data) throw new Unauthorized('Invalid Credientials');
 
     res.status(200)
-        .send({ accessToken: data.accessToken })
         .cookie('refreshToken', data.refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
             maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        })
+        .send({ success: true, accessToken: data.accessToken });
+};
+
+
+const refresh = async (req: ValidRequest<undefined>, res: Response) => {
+    const data = await AuthService.Refresh(req);
+
+    res.status(200)
+        .cookie('refreshToken', data.refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        })
+        .send({ success: true, accessToken: data.accessToken });
 };
